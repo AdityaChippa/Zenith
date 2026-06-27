@@ -1,0 +1,199 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+  --grain-opacity: 0.045;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background: #05070d;
+  color: #e8ecf4;
+  font-family: var(--font-body), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* Film grain overlay used across acts (Otherlife-flavoured restraint). */
+.grain::after {
+  content: '';
+  position: fixed;
+  inset: -50%;
+  z-index: 60;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+  opacity: var(--grain-opacity);
+  mix-blend-mode: screen;
+  animation: grain-shift 8s steps(6) infinite;
+}
+
+@keyframes grain-shift {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(-1.5%, 1%);
+  }
+}
+
+/* HUD primitives ----------------------------------------------------------- */
+.hud-label {
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: #7c8aa5;
+}
+
+.hud-value {
+  font-family: var(--font-mono), monospace;
+  font-variant-numeric: tabular-nums;
+  color: #e8ecf4;
+}
+
+.hud-panel {
+  background: rgba(10, 14, 24, 0.55);
+  border: 1px solid rgba(124, 138, 165, 0.18);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+.hairline {
+  border-color: rgba(124, 138, 165, 0.18);
+}
+
+/* Accessible focus ring */
+:focus-visible {
+  outline: 2px solid #ffb35c;
+  outline-offset: 2px;
+}
+
+/* Custom scrollbar (thin, instrument-like) */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(124, 138, 165, 0.25);
+  border-radius: 8px;
+}
+
+/* Reduced motion: kill ambient animation. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+  .grain::after {
+    animation: none;
+  }
+}
+
+/* Magnetic / interactive cursor affordance */
+.magnetic {
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
+}
+
+/* Time-scrub range input (instrument styling) */
+.zenith-range {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 2px;
+  background: rgba(124, 138, 165, 0.3);
+  border-radius: 2px;
+  outline: none;
+}
+.zenith-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #ffb35c;
+  box-shadow: 0 0 10px rgba(255, 179, 92, 0.8);
+  cursor: pointer;
+  border: none;
+}
+.zenith-range::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #ffb35c;
+  box-shadow: 0 0 10px rgba(255, 179, 92, 0.8);
+  cursor: pointer;
+  border: none;
+}
+
+/* Premium motion + surface utilities ---------------------------------------- */
+@keyframes zoomIn {
+  from { opacity: 0; transform: scale(0.92) translateY(12px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes shimmer {
+  0%   { background-position: -300px 0; }
+  100% { background-position: 300px 0; }
+}
+
+/* Frosted glass surface — neutral, premium, monochrome */
+.glass {
+  background: linear-gradient(180deg, rgba(28, 30, 36, 0.66), rgba(16, 17, 21, 0.58));
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  backdrop-filter: blur(22px) saturate(115%);
+  -webkit-backdrop-filter: blur(22px) saturate(115%);
+  box-shadow: 0 10px 44px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+.glass-hover {
+  transition: border-color 0.4s cubic-bezier(0.16,1,0.3,1),
+              transform 0.4s cubic-bezier(0.16,1,0.3,1),
+              box-shadow 0.4s ease, background 0.4s ease;
+}
+.glass-hover:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255, 255, 255, 0.16);
+  box-shadow: 0 16px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04);
+}
+
+/* Skeleton shimmer for loading states */
+.skeleton {
+  background: linear-gradient(90deg, rgba(124,138,165,0.08) 25%, rgba(124,138,165,0.16) 50%, rgba(124,138,165,0.08) 75%);
+  background-size: 600px 100%;
+  animation: shimmer 1.4s infinite linear;
+  border-radius: 8px;
+}
+
+/* ============================================================
+   ENHANCED VIEW (ported demo zenith) — all scoped to .demo-zenith
+   ============================================================ */
+.demo-zenith {
+  font-family: var(--font-dzdisplay), system-ui, sans-serif;
+  color: #E8ECF5;
+}
+@layer components {
+  .demo-zenith .panel { @apply rounded-lg border border-dzhairline bg-dzpanel/70 backdrop-blur-md; }
+  .demo-zenith .panel-solid { @apply rounded-lg border border-dzhairline bg-dzpanel/90 backdrop-blur-md; }
+  .demo-zenith .eyebrow { @apply font-mono text-[10px] uppercase tracking-[0.32em] text-dzmuted; }
+  .demo-zenith .num { @apply font-mono tabular-nums; }
+  .demo-zenith .btn { @apply rounded-md border border-dzhairline bg-white/[0.03] px-3 py-2 text-sm transition-colors hover:border-dzsignal/40 hover:bg-white/[0.06] focus:outline-none focus-visible:ring-1 focus-visible:ring-dzsignal/60; }
+  .demo-zenith .chip { @apply rounded-full border border-dzhairline px-2.5 py-1 font-mono text-[11px] uppercase tracking-wider transition-colors; }
+}
+.demo-zenith input[type="range"] { -webkit-appearance: none; appearance: none; height: 2px; background: rgba(232,236,245,0.18); border-radius: 2px; outline: none; }
+.demo-zenith input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 13px; height: 13px; border-radius: 50%; background: #4fe3c1; cursor: pointer; box-shadow: 0 0 10px rgba(79,227,193,0.6); }
+.demo-zenith input[type="range"]::-moz-range-thumb { width: 13px; height: 13px; border: none; border-radius: 50%; background: #4fe3c1; cursor: pointer; }
